@@ -30,6 +30,9 @@ class UserManager(BaseUserManager):
 
 # Creating a custom user model
 class User(AbstractBaseUser):
+    uid = models.CharField(max_length=50, primary_key=True)
+    imageUrl = models.CharField(max_length=255,
+                                default="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y")
     email = models.EmailField(max_length=255, unique=True, null=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
