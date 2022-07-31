@@ -36,7 +36,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(max_length=255, unique=True, null=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
-    password = models.CharField(max_length=255, null=False)
+    password = models.CharField(max_length=255, default="")
     refresh = models.CharField(max_length=512, null=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ["password"]
