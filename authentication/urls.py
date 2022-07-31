@@ -1,6 +1,6 @@
 from django.urls import path
 
-from authentication.views import get_authentication_flow, oauth_callback,success
+from authentication.views import get_authentication_flow, oauth_callback, success
 
 urlpatterns = [
     path('login-with-google/', get_authentication_flow, name='login'),
