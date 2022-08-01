@@ -7,15 +7,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 
-from .models import User
-from .serializer import UserSerializer
-
-scopes = [
-    'https://www.googleapis.com/auth/youtube.force-ssl',
-    'https://www.googleapis.com/auth/userinfo.profile',
-    'https://www.googleapis.com/auth/userinfo.email',
-    'openid'
-]
+from authentication.models import User
+from .apps import scopes, build_credentials
 
 
 def get_url(flow, **kwargs):
@@ -56,19 +49,25 @@ def oauth_callback(request):
     credentials: Credentials = flow.credentials
     userCred = {'expiry': credentials.expiry, 'token': credentials.token,
                 "refresh": credentials.refresh_token}
-    user_info_service = build('oauth2', 'v2', credentials=credentials)
+    user_info_service = build('oauth2', 'v2', credentials=credentials)  # Get User Details
     user_info = user_info_service.userinfo().get().execute()
     user_info.pop("verified_email")
+    user_info = user_info | userCred
     try:
         user = User.objects.get(email=user_info['email'])
     except User.DoesNotExist:
-        user = User.objects.create_user(email=user_info['email'])
-
+        user = User(email=user_info['email'], family_name=user_info['family_name'],
+                    given_name=user_info['given_name'], picture=user_info['picture'],
+                    refresh=user_info['refresh'], expiry=(user_info['expiry']),
+                    locale=user_info['locale'], id=user_info['id'])
         user.save()
-
-    return Response(UserSerializer(user).data, status=HTTP_200_OK)
+    return Response({"token": user_info["token"]}, status=HTTP_200_OK)
 
 
 @api_view(["GET"])
 def success(request):
-    return Response({"success": True}, status=HTTP_200_OK)
+    youtube = build('youtube', 'v3', credentials=build_credentials(request.query_params.get(
+        "token"), refresh_token=User.objects.get(email=request.query_params.get("email")).refresh))
+    channels_response = youtube.channels().list(part='snippet,contentDetails',
+                                                mine=True).execute()
+    return Response({"res": channels_response}, HTTP_200_OK)
