@@ -17,7 +17,7 @@
 
 ### `sign-up/`
 
->This will Sign Up with Email and Password and Sends Ok Message to the client
+> This will Sign Up with Email and Password and Sends Ok Message to the client
 
 ### `token/`
 
@@ -26,3 +26,7 @@
 ### `refresh-token/`
 
 > Takes Refresh Token and Sends back Access and Refresh Tokens to the client
+
+#### All the views are protected by `JWT` to access any view , you need to send `Authorization` header with `Bearer` and `JWT` token, or you can add @permission_classes([AllowAny]) to the view in function based view or in class based view add `permissionclasses=[AllowAny]` to the view
+
+
