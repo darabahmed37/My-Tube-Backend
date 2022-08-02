@@ -131,10 +131,9 @@ AUTH_USER_MODEL = "authentication.User"
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-
-
+    ], 'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
 }
-

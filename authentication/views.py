@@ -6,10 +6,11 @@ from django.http.response import HttpResponseRedirect
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from rest_framework.decorators import api_view
+from rest_framework.decorators import permission_classes
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.decorators import authentication_classes
-from rest_framework_simplejwt.authentication import JWTAuthentication
+
 from authentication.models import User
 from .apps import scopes, Request
 from .tokens import gen_tokens, sendTokens, get_tokens_for_user
@@ -29,6 +30,7 @@ in the url params. after generating the url, user will be redirected to the url 
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_authentication_flow(request: Request):
     prompt = request.query_params.get("prompt", default="")
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',
@@ -44,6 +46,7 @@ def get_authentication_flow(request: Request):
 
 
 @api_view(["GET"])
+@permission_classes([AllowAny])
 def oauth_callback(request):
     parms = request.query_params.dict()
     state = parms['state']
@@ -76,6 +79,7 @@ def oauth_callback(request):
 
 
 @api_view(["POST"])
+@permission_classes([AllowAny])
 def sign_up_with_email_and_password(request: Request):
     email = request.data.get("email")
     password = request.data.get("password")
@@ -91,6 +95,7 @@ def sign_up_with_email_and_password(request: Request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def sign_in_with_email_and_password(request: Request):
     email = request.data.get("email")
     password = request.data.get("password")
@@ -107,7 +112,18 @@ def sign_in_with_email_and_password(request: Request):
         raise PermissionDenied("User does not exist")
 
 
-@authentication_classes(JWTAuthentication)
 @api_view(['POST', 'GET'])
+# @permission_classes([AllowAny])
 def testing(request: Request):
+    print(request)
     return Response({"message": "Hello World"})
+
+
+@api_view(['POST'])
+def update_password(request: Request):
+    user: User = request.user
+    update_parm = request.data.dict()
+    if "password" in update_parm.keys():
+        user.set_password(update_parm["password"])
+        user.save()
+        return Response({"message": "Password updated successfully"}, status=200)
