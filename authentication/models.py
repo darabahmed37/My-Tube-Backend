@@ -31,16 +31,16 @@ class UserManager(BaseUserManager):
 # Creating a custom user model
 class User(AbstractBaseUser):
     id = models.CharField(max_length=50, primary_key=True)
-    family_name = models.CharField(max_length=50, blank=True, name='family_name')
-    given_name = models.CharField(max_length=50, blank=True, name='given_name')
+    family_name = models.CharField(max_length=50, default="", name='family_name')
+    given_name = models.CharField(max_length=50, default="", name='given_name')
     picture = models.CharField(max_length=255,
                                default="https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y")
     email = models.EmailField(max_length=255, unique=True, null=False)
     staff = models.BooleanField(default=False)
     admin = models.BooleanField(default=False)
     locale = models.CharField(max_length=50, default="en-us")
-    password = models.CharField(max_length=255, blank=True)
-    refresh = models.CharField(max_length=512, null=True)
+    password = models.CharField(max_length=255, default="")
+    refresh = models.CharField(max_length=512, default="")
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ["password"]
     objects = UserManager()

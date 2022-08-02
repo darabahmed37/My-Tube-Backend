@@ -1,6 +1,11 @@
+
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
+
 from django.apps import AppConfig
+from django.http import HttpRequest
+from googleapiclient.discovery import build
+from rest_framework.request import Request
 
 scopes = [
     'https://www.googleapis.com/auth/youtube.force-ssl',
@@ -29,3 +34,14 @@ def build_credentials(token, refresh_token):
     }
     credentials = google.oauth2.credentials.Credentials(**parms)
     return credentials
+
+
+def get_youtube(credentials=None, access_token=None, refresh_token=None):
+    if access_token is not None and refresh_token is not None:
+        credentials = build_credentials(access_token, refresh_token)
+    return build("youtube", 'v3', credentials=credentials)
+
+
+Request = HttpRequest | Request
+
+
