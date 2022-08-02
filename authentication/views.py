@@ -103,20 +103,13 @@ def sign_in_with_email_and_password(request: Request):
     try:
         user = User.objects.get(email=email)
         if user.check_password(password):
-            if user.refresh is None or user.id is None:
+            if user.refresh is None or user.refresh == "":
                 return HttpResponseRedirect("/auth/login-with-google/?prompt=consent")
             return sendTokens(response, gen_tokens(email, password))
         else:
             raise PermissionDenied("Invalid password")
     except User.DoesNotExist:
         raise PermissionDenied("User does not exist")
-
-
-@api_view(['POST', 'GET'])
-# @permission_classes([AllowAny])
-def testing(request: Request):
-    print(request)
-    return Response({"message": "Hello World"})
 
 
 @api_view(['POST'])
