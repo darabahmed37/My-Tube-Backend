@@ -65,6 +65,8 @@ def oauth_callback(request):
                  key in ["email", "family_name", "given_name", "refresh", 'id', 'locale', 'picture']}
     if credentials.refresh_token is not None:
         user_info['refresh'] = credentials.refresh_token
+    else:
+        return HttpResponseRedirect("/auth/login-with-google/?prompt=consent")
     try:
         user = User.objects.get(email=user_info['email'])
         if user.refresh == "":
