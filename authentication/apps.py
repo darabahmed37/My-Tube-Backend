@@ -1,4 +1,3 @@
-
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
 
@@ -36,12 +35,10 @@ def build_credentials(token, refresh_token):
     return credentials
 
 
-def get_youtube(credentials=None, access_token=None, refresh_token=None):
-    if access_token is not None and refresh_token is not None:
-        credentials = build_credentials(access_token, refresh_token)
+def get_youtube(credentials=None, refresh_token=None):
+    if None and refresh_token is not None:
+        credentials = build_credentials(refresh_token)
     return build("youtube", 'v3', credentials=credentials)
 
 
 Request = HttpRequest | Request
-
-

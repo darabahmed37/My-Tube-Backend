@@ -31,7 +31,7 @@ in the url params. after generating the url, user will be redirected to the url 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def get_authentication_flow(request: Request):
+def google_sign_in(request: Request):
     prompt = request.query_params.get("prompt", default="")
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',
                                                                    scopes=scopes)
@@ -41,7 +41,6 @@ def get_authentication_flow(request: Request):
         authorization_url, _ = get_url(flow)
     elif prompt == 'consent':
         authorization_url, _ = get_url(flow, prompt="consent")
-
     return HttpResponseRedirect(authorization_url)
 
 
@@ -63,15 +62,15 @@ def oauth_callback(request):
     user_info = user_info_service.userinfo().get().execute()
     user_info = {key: value for key, value in user_info.items() if
                  key in ["email", "family_name", "given_name", "refresh", 'id', 'locale', 'picture']}
-    if credentials.refresh_token is not None:
-        user_info['refresh'] = credentials.refresh_token
-    else:
-        return HttpResponseRedirect("/auth/login-with-google/?prompt=consent")
     try:
         user = User.objects.get(email=user_info['email'])
         if user.refresh == "":
-            User.objects.filter(id=user.id).update(**user_info)
+            if credentials.refresh_token is not None:
+                user.refresh = credentials.refresh_token
+                user.save()
+            else:
 
+                return HttpResponseRedirect("/auth/login-with-google/?prompt=consent")
     except User.DoesNotExist:
         user = User(**user_info)
         user.save()
