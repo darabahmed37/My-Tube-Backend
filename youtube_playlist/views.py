@@ -5,7 +5,7 @@ from authentication.apps import get_youtube
 
 
 @api_view(['GET'])
-def fetch_playList(request):
+def fetch_playlist(request):
     youtube = get_youtube(request)
     playlists = youtube.playlists().list(part="snippet,contentDetails",
                                          maxResults=25,
@@ -26,7 +26,7 @@ def get_playlist_items(request, playlist_id):
 
 
 @api_view(['GET'])
-def get_video(request,video_id):
+def get_video(request, video_id):
     youtube = get_youtube(request)
     video_info = youtube.videos().list(part="snippet,contentDetails,player",
                                        id=video_id,
