@@ -2,9 +2,9 @@ import os
 
 import google_auth_oauthlib.flow
 from django.contrib.auth import user_logged_in
-from django.http.response import HttpResponseRedirect
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.decorators import permission_classes
 from rest_framework.exceptions import PermissionDenied
@@ -29,7 +29,7 @@ in the url params. after generating the url, user will be redirected to the url 
 """
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def google_sign_in(request: Request):
     prompt = request.query_params.get("prompt", default="")
@@ -41,7 +41,7 @@ def google_sign_in(request: Request):
         authorization_url, _ = get_url(flow)
     elif prompt == 'consent':
         authorization_url, _ = get_url(flow, prompt="consent")
-    return HttpResponseRedirect(authorization_url)
+    return Response({'authorization_url': authorization_url})
 
 
 @api_view(["GET"])
@@ -70,13 +70,14 @@ def oauth_callback(request):
                 user.save()
             else:
 
-                return HttpResponseRedirect("/auth/login-with-google/?prompt=consent")
+                return Response({'login_url': os.getenv("DOMAIN") + "auth/login-with-google/?prompt=consent"},
+                                status=status.HTTP_307_TEMPORARY_REDIRECT)
     except User.DoesNotExist:
         user = User(**user_info)
         user.save()
     user_logged_in.send(sender=user.__class__,
                         request=request, user=user)
-    return sendTokens(Response(), get_tokens_for_user(user))
+    return sendTokens(get_tokens_for_user(user))
 
 
 @api_view(["POST"])
@@ -100,13 +101,12 @@ def sign_up_with_email_and_password(request: Request):
 def sign_in_with_email_and_password(request: Request):
     email = request.data.get("email")
     password = request.data.get("password")
-    response = Response()
     try:
         user = User.objects.get(email=email)
         if user.check_password(password):
             if user.refresh is None or user.refresh == "":
-                return HttpResponseRedirect("/auth/login-with-google/?prompt=consent")
-            return sendTokens(response, gen_tokens(email, password))
+                return Response({"google_uri": os.getenv("DOMAIN") + "auth/login-with-google/?prompt=consent"})
+            return sendTokens(gen_tokens(email, password))
         else:
             raise PermissionDenied("Invalid password")
     except User.DoesNotExist:
