@@ -39,7 +39,7 @@ def build_credentials(token, refresh_token):
 def get_youtube(request: Request):
     if request.user.refresh is None or request.user.refresh == "":
         raise PermissionDenied("User does not have a refresh token")
-    credentials = build_credentials(token=None, refresh_token=request.user.refresh_token)
+    credentials = build_credentials(token=None, refresh_token=request.user.refresh)
     return build("youtube", 'v3', credentials=credentials)
 
 

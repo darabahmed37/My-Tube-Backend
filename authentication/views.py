@@ -106,7 +106,7 @@ def sign_in_with_email_and_password(request: Request):
         if user.check_password(password):
             if user.refresh is None or user.refresh == "":
                 return Response({"google_uri": os.getenv("DOMAIN") + "auth/login-with-google/?prompt=consent"})
-            return sendTokens(gen_tokens(email, password))
+            return Response(gen_tokens(email, password))
         else:
             raise PermissionDenied("Invalid password")
     except User.DoesNotExist:
