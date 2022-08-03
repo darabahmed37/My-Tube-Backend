@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'authentication',
     "rest_framework_simplejwt",
-    "corsheaders"
+    "corsheaders",
+    "youtube_playlist"
 
 ]
 

@@ -4,6 +4,7 @@ import google_auth_oauthlib.flow
 from django.apps import AppConfig
 from django.http import HttpRequest
 from googleapiclient.discovery import build
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 
 scopes = [
@@ -35,9 +36,10 @@ def build_credentials(token, refresh_token):
     return credentials
 
 
-def get_youtube(credentials=None, refresh_token=None):
-    if None and refresh_token is not None:
-        credentials = build_credentials(refresh_token)
+def get_youtube(request: Request):
+    if request.user.refresh is None or request.user.refresh == "":
+        raise PermissionDenied("User does not have a refresh token")
+    credentials = build_credentials(token=None, refresh_token=request.user.refresh_token)
     return build("youtube", 'v3', credentials=credentials)
 
 
