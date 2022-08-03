@@ -14,7 +14,7 @@ def gen_tokens(email, password):
 def sendTokens(tokens):
     access, refresh = tokens["access"], tokens["refresh"]
     response = HttpResponseRedirect(redirect_to=os.getenv("FRONT_END_DOMAIN") + "success/")
-    response.set_cookie(key='refresh_token', value=refresh, httponly=True)
+    response.set_cookie(key='refresh', value=refresh, httponly=True)
     response.set_cookie(key='access', value=access, httponly=True)
 
     return response

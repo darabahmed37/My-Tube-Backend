@@ -148,5 +148,6 @@ CORS_ALLOW_HEADERS = default_headers + (
 )
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+
 }
