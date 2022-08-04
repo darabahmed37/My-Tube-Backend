@@ -1,9 +1,9 @@
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
-
 from django.apps import AppConfig
 from django.http import HttpRequest
 from googleapiclient.discovery import build
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.request import Request
 
@@ -39,8 +39,12 @@ def build_credentials(token, refresh_token, code=None):
         "enable_reauth_refresh": True,
         "token_uri": flow.client_config['token_uri']
     }
-    credentials = google.oauth2.credentials.Credentials(**parms)
-    return credentials
+    try:
+        credentials = google.oauth2.credentials.Credentials(**parms)
+        return credentials
+    except Exception:
+        raise AuthenticationFailed(
+            "Issue With Google Authentication Kindly Redirect To auth/login-with-google/?prompt=consent")
 
 
 def get_youtube(request: Request):
