@@ -5,30 +5,11 @@ from django.db import models
 # Setting Up Custom User
 
 # Creating a custom user manager
-class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
-        if not email:
-            raise ValueError("Users must have an email address")
-        user = self.model(email=self.normalize_email(email))
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_staffuser(self, email, password):
-        user = self.create_user(email, password)
-        user.staff = True
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, password):
-        user = self.create_user(email, password)
-        user.staff = True
-        user.admin = True
-        user.save(using=self._db)
-        return user
-
 
 # Creating a custom user model
+from authentication.manager import UserManager
+
+
 class User(AbstractBaseUser):
     id = models.CharField(max_length=50, primary_key=True)
     family_name = models.CharField(max_length=50, default="", name='family_name')

@@ -20,7 +20,14 @@ class AuthenticationConfig(AppConfig):
     name = 'authentication'
 
 
-def build_credentials(token, refresh_token,code=None):
+def get_authorization_url(flow, **kwargs):
+    authorization_url, state = flow.authorization_url(access_type='offline',
+                                                      include_granted_scopes='true',
+                                                      **kwargs)
+    return authorization_url, state
+
+
+def build_credentials(token, refresh_token, code=None):
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',
                                                                    scopes=scopes)
     parms = {

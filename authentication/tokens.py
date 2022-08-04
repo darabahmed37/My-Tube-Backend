@@ -1,14 +1,9 @@
 import os
 
-import requests
 from django.http.response import HttpResponseRedirect
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from authentication.models import User
-
-
-def gen_tokens(email, password):
-    return requests.post(os.getenv("DOMAIN") + "auth/token/", data={"email": email, "password": password}).json()
 
 
 def sendTokens(tokens):
