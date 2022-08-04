@@ -5,10 +5,10 @@ import google_auth_oauthlib.flow
 from django.contrib.auth import user_logged_in
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from rest_framework import status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.status import HTTP_401_UNAUTHORIZED
 from rest_framework.views import APIView
 
 from authentication.apps import get_authorization_url
@@ -29,7 +29,7 @@ class GoogleSignIn(APIView):
         prompt = request.query_params.get("prompt", default="")
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',
                                                                        scopes=scopes)
-        flow.redirect_uri = urljoin(os.getenv("FRONT_END_DOMAIN"), os.getenv("OAUTH-CALLBACK"))
+        flow.redirect_uri = urljoin(os.getenv("FRONT_END_DOMAIN"), os.getenv("OAUTH_CALLBACK"))
 
         authorization_url = ""
         if prompt == "":
@@ -49,7 +49,7 @@ class OAuthCallBack(APIView):
                                                                        scopes=scopes,
                                                                        state=state)
 
-        flow.redirect_uri = urljoin(os.getenv("FRONT_END_DOMAIN"), os.getenv("OAUTH-CALLBACK"))
+        flow.redirect_uri = urljoin(os.getenv("FRONT_END_DOMAIN"), os.getenv("OAUTH_CALLBACK"))
         print(flow.redirect_uri)
         flow.fetch_token(code=code)
         credentials: Credentials = flow.credentials
@@ -59,15 +59,17 @@ class OAuthCallBack(APIView):
                      key in ["email", "family_name", "given_name", "refresh", 'id', 'locale', 'picture']}
         try:
             user = User.objects.get(email=user_info['email'])
-            if user.refresh == "":
-                if credentials.refresh_token is not None:
-                    user.refresh = credentials.refresh_token
-                    user.save()
-                else:
+            if credentials.refresh_token is not None:
 
-                    return Response(
-                        {'login_url': urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
-                        status=status.HTTP_307_TEMPORARY_REDIRECT)
+                user.refresh = credentials.refresh_token
+                user.save()
+            elif user.refresh == "":
+
+                return Response(
+                    {"Message": "Error With Google Authentication",
+                     "redirectUrl": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
+
+                    status=HTTP_401_UNAUTHORIZED)
         except User.DoesNotExist:
             user = User(**user_info)
             user.save()
