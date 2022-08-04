@@ -121,3 +121,17 @@ def update_password(request: Request):
         user.set_password(update_parm["password"])
         user.save()
         return Response({"message": "Password updated successfully"}, status=200)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def customBackend(request: Request):
+    code = request.data.get("code")
+    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',
+                                                                   scopes=scopes,
+                                                                   )
+
+    flow.redirect_uri = os.getenv("DOMAIN") + 'auth/cus/'
+    flow.fetch_token(code=code)
+    credentials: Credentials = flow.credentials
+    return Response(gen_tokens(flow.credentials.id_token['email'], flow.credentials.refresh_token))

@@ -20,7 +20,7 @@ class AuthenticationConfig(AppConfig):
     name = 'authentication'
 
 
-def build_credentials(token, refresh_token):
+def build_credentials(token, refresh_token,code=None):
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',
                                                                    scopes=scopes)
     parms = {
