@@ -39,6 +39,9 @@ class GoogleSignIn(APIView):
         return Response({'authorization_url': authorization_url})
 
 
+"""It handle the callback by Google and Generate Google Credentials And Stores it in Database Against User"""
+
+
 class OAuthCallBack(APIView):
     permission_classes = (AllowAny,)
 
