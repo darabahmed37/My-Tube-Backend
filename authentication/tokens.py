@@ -1,6 +1,4 @@
-import os
-
-from django.http.response import HttpResponseRedirect
+from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from authentication.models import User
@@ -8,11 +6,11 @@ from authentication.models import User
 
 def sendTokens(tokens):
     access, refresh = tokens["access"], tokens["refresh"]
-    response = HttpResponseRedirect(redirect_to=os.getenv("FRONT_END_DOMAIN") + "success/")
-    response.set_cookie(key='refresh', value=refresh, httponly=True)
-    response.set_cookie(key='access', value=access, httponly=True)
 
-    return response
+    return Response({
+        'refresh': refresh,
+        'access': access,
+    })
 
 
 def get_tokens_for_user(user: User):

@@ -2,11 +2,6 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
 
-# Setting Up Custom User
-
-# Creating a custom user manager
-
-# Creating a custom user model
 from authentication.manager import UserManager
 
 
