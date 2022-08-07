@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 from authentication.apps import get_authorization_url
 from authentication.apps import scopes
 from authentication.models import User
-from authentication.tokens import sendTokens, get_tokens_for_user
+from authentication.tokens import send_tokens, get_tokens_for_user
 
 """
 This API VIEW will handle the user authentication if user want to get an refresh token then pass prompt='consent' 
@@ -82,15 +82,15 @@ class OAuthCallBack(APIView):
             user.save()
         user_logged_in.send(sender=user.__class__,
                             request=request, user=user)
-        return sendTokens(get_tokens_for_user(user))
+        return send_tokens(get_tokens_for_user(user))
 
 
 class SignUpEmailAndPassword(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
+        email = request.data.get("email")  # Get Email From Request
+        password = request.data.get("password")  # Get Password From Request
 
         try:
             user = User.objects.get(email=email)
@@ -115,7 +115,7 @@ class SignInWithEmailAndPassword(APIView):
                     return Response(
                         {"google_uri": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
                         status=status.HTTP_307_TEMPORARY_REDIRECT)
-                return sendTokens(get_tokens_for_user(user))
+                return send_tokens(get_tokens_for_user(user))
             else:
                 raise PermissionDenied("Invalid password")
         except User.DoesNotExist:

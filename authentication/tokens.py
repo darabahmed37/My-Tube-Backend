@@ -5,7 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.models import User
 
 
-def sendTokens(tokens):
+def send_tokens(tokens):
     access, refresh = tokens["access"], tokens["refresh"]
 
     return Response({
