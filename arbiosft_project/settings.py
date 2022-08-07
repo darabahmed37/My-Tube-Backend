@@ -65,8 +65,7 @@ ROOT_URLCONF = 'arbiosft_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -146,8 +145,3 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = default_headers + (
     'Access-Control-Allow-Origin',
 )
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
-
-}
