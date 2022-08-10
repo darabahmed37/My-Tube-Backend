@@ -38,7 +38,7 @@ class GoogleSignIn(APIView):
         elif prompt == 'consent':
             authorization_url, _ = get_authorization_url(
                 flow, prompt="consent")
-        return Response({'authorization_url': authorization_url}, status=status.HTTP_307_TEMPORARY_REDIRECT)
+        return Response({'authorization_url': authorization_url}, status=status.HTTP_200_OK)
 
 
 """It handle the callback by Google and Generate Google Credentials And Stores it in Database Against User"""
@@ -113,7 +113,7 @@ class SignInWithEmailAndPassword(APIView):
             if user.check_password(password):
                 if user.refresh is None or user.refresh == "":
                     return Response(
-                        {"google_uri": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
+                        {"redirectUrl": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
                         status=status.HTTP_307_TEMPORARY_REDIRECT)
                 return send_tokens(get_tokens_for_user(user))
             else:
