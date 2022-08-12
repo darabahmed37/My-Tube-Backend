@@ -65,7 +65,6 @@ class OAuthCallBack(APIView):
         user_info = {key: value for key, value in user_info.items() if
                      key in ["email", "family_name", "given_name", "refresh", 'id', 'locale', 'picture']}
         try:
-            print(request)
             user = User.objects.get(email=user_info['email'])
             if credentials.refresh_token is not None:
 
