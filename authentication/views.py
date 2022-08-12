@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from authentication.apps import get_authorization_url
+from authentication.apps import get_authorization_url, Request
 from authentication.apps import scopes
 from authentication.models import User
 from authentication.tokens import send_tokens, get_tokens_for_user
@@ -47,7 +47,7 @@ class GoogleSignIn(APIView):
 class OAuthCallBack(APIView):
     permission_classes = (AllowAny,)
 
-    def post(self, request):
+    def post(self, request: Request):
         state = request.data.get("state")
         code = request.data.get("code")
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',
@@ -56,8 +56,8 @@ class OAuthCallBack(APIView):
 
         flow.redirect_uri = urljoin(
             os.getenv("FRONT_END_DOMAIN"), os.getenv("OAUTH_CALLBACK"))
-        print(flow.redirect_uri)
         flow.fetch_token(code=code)
+
         credentials: Credentials = flow.credentials
         user_info_service = build(
             'oauth2', 'v2', credentials=credentials)  # Get User Details
@@ -65,6 +65,7 @@ class OAuthCallBack(APIView):
         user_info = {key: value for key, value in user_info.items() if
                      key in ["email", "family_name", "given_name", "refresh", 'id', 'locale', 'picture']}
         try:
+            print(request)
             user = User.objects.get(email=user_info['email'])
             if credentials.refresh_token is not None:
 
@@ -113,7 +114,9 @@ class SignInWithEmailAndPassword(APIView):
             if user.check_password(password):
                 if user.refresh is None or user.refresh == "":
                     return Response(
-                        {"redirectUrl": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
+                        {"redirectUrl": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")
+
+                         },
                         status=status.HTTP_307_TEMPORARY_REDIRECT)
                 return send_tokens(get_tokens_for_user(user))
             else:
