@@ -1,16 +1,13 @@
-### .ENV
+# Description
 
-> DJANGO_SECRET_KEY=88888888
+### Authentication
 
-> DB_USERNAME=88888888
+- Login/SignUp With Google
+- Login/SignUp with Email and Password
 
-> DB_PASSWORD=88888888
+### YouTube Data Api
 
-> DB_PORT=88888888
+- Get User Playlists
+- Get User Playlist items
+- Get Video Details
 
-> DOMAIN=88888888
-
-> FRONT_END_DOMAIN=88888888
->
-
-These Variables must be added in .env file
