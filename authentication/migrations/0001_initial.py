@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -16,7 +15,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('last_login', models.DateTimeField(blank=True, null=True, verbose_name='last login')),
                 ('uid', models.CharField(max_length=50, primary_key=True, serialize=False)),
-                ('imageUrl', models.CharField(default='https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y', max_length=255)),
+                ('imageUrl',
+                 models.CharField(default='https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y',
+                                  max_length=255)),
                 ('email', models.EmailField(max_length=255, unique=True)),
                 ('staff', models.BooleanField(default=False)),
                 ('admin', models.BooleanField(default=False)),
