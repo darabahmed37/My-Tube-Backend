@@ -67,9 +67,8 @@ class OAuthCallBack(APIView):
         try:
             user = User.objects.get(email=user_info['email'])
             if credentials.refresh_token is not None:
+                User.objects.filter(email=user_info['email']).update(**user_info, refresh=credentials.refresh_token)
 
-                user.refresh = credentials.refresh_token
-                user.save()
             elif user.refresh == "":
 
                 return Response(
@@ -77,9 +76,11 @@ class OAuthCallBack(APIView):
                      "redirectUrl": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
 
                     status=status.HTTP_307_TEMPORARY_REDIRECT)
+
         except User.DoesNotExist:
             user = User(**user_info)
             user.save()
+
         user_logged_in.send(sender=user.__class__,
                             request=request, user=user)
         return send_tokens(get_tokens_for_user(user))
