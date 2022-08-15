@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from authentication.apps import get_authorization_url, Request
 from authentication.apps import scopes
 from authentication.models import User
+from authentication.serializer import UserSerializer
 from authentication.tokens import send_tokens, get_tokens_for_user
 
 """
@@ -78,7 +79,7 @@ class OAuthCallBack(APIView):
                     status=status.HTTP_307_TEMPORARY_REDIRECT)
 
         except User.DoesNotExist:
-            user = User(**user_info)
+            user = User(**user_info, refresh=credentials.refresh_token)
             user.save()
 
         user_logged_in.send(sender=user.__class__,
@@ -134,3 +135,9 @@ class UpdatePassword(APIView):
             user.save()
             return Response({"message": "Password updated successfully"}, status=status.HTTP_202_ACCEPTED)
         return Response({"message": "Password not updated"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GetUserInfo(APIView):
+    def get(self, request):
+        user: User = request.user
+        return Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)

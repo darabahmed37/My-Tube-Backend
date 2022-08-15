@@ -2,7 +2,7 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 from authentication.views import GoogleSignIn, OAuthCallBack, SignUpEmailAndPassword, \
-    SignInWithEmailAndPassword, UpdatePassword
+    SignInWithEmailAndPassword, UpdatePassword,GetUserInfo
 
 urlpatterns = [
     path('login-with-google/', GoogleSignIn.as_view(), name='login'),
@@ -11,5 +11,5 @@ urlpatterns = [
     path('sign-in/', SignInWithEmailAndPassword.as_view(), name='sign_in_with_email_and_password'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('update-password/', UpdatePassword.as_view(), name='password_update'),
-
+    path("get-user/", GetUserInfo.as_view(), name="get_user"),
 ]
