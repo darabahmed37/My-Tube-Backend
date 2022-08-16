@@ -2,6 +2,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
 
 from authentication.manager import UserManager
+from user_activity.models import Timer
 
 
 class User(AbstractBaseUser):
@@ -16,10 +17,10 @@ class User(AbstractBaseUser):
     locale = models.CharField(max_length=50, default="en-us")
     password = models.CharField(max_length=255, default="")
     refresh = models.CharField(max_length=512, default="")
-    timer = models.ForeignKey("user_activity.Timer", on_delete=models.CASCADE)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ["password"]
     objects = UserManager()
+    timer = models.ForeignKey(Timer, unique=True, on_delete=models.CASCADE)
 
     def get_username(self):
         return self.email

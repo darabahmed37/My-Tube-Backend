@@ -64,7 +64,7 @@ class OAuthCallBack(APIView):
             'oauth2', 'v2', credentials=credentials)  # Get User Details
         user_info = user_info_service.userinfo().get().execute()
         user_info = {key: value for key, value in user_info.items() if
-                     key in ["email", "family_name", "given_name", "refresh", 'id', 'locale', 'picture']}
+                     key in ["email", "family_name", "given_name", 'id', 'locale', 'picture']}
         try:
             user = User.objects.get(email=user_info['email'])
             if credentials.refresh_token is not None:
@@ -79,6 +79,11 @@ class OAuthCallBack(APIView):
                     status=status.HTTP_307_TEMPORARY_REDIRECT)
 
         except User.DoesNotExist:
+            if credentials.refresh_token is None:
+                return Response(
+                    {"message": "Google Login Required",
+                     "redirectUrl": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
+                    status=status.HTTP_307_TEMPORARY_REDIRECT)
             user = User(**user_info, refresh=credentials.refresh_token)
             user.save()
 
@@ -129,12 +134,12 @@ class SignInWithEmailAndPassword(APIView):
 class UpdatePassword(APIView):
     def post(self, request):
         user: User = request.user
-        update_parm = request.data.dict()
-        if "password" in update_parm.keys():
-            user.set_password(update_parm["password"])
+        if "password" in request.data.keys():
+            user.set_password(request.data["password"])
             user.save()
             return Response({"message": "Password updated successfully"}, status=status.HTTP_202_ACCEPTED)
-        return Response({"message": "Password not updated"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"message": "Please send Password in Request Body"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GetUserInfo(APIView):
