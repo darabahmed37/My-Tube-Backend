@@ -17,10 +17,12 @@ class User(AbstractBaseUser):
     locale = models.CharField(max_length=50, default="en-us")
     password = models.CharField(max_length=255, default="")
     refresh = models.CharField(max_length=512, default="")
+    playlist = models.CharField(max_length=255, default="PLwajP6X62-C5jtqbacQD4YElNnMOj1tFK")
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ["password"]
     objects = UserManager()
-    timer = models.ForeignKey(Timer, unique=True, on_delete=models.CASCADE)
+
+    # timer = models.ForeignKey(Timer, unique=True, on_delete=models.CASCADE)
 
     def get_username(self):
         return self.email
