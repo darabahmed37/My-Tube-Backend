@@ -1,7 +1,8 @@
 from django.urls import path
 
-from user_activity.views import TimerRAUAPIView
+from user_activity.views import WatchTimeRAUAPIView, WatchTimeListCreateAPIView
 
 urlpatterns = [
-    path("", TimerRAUAPIView.as_view(), name="timer"),
+    path("<str:user>/", WatchTimeRAUAPIView.as_view(), name="timer-detail"),
+    path("", WatchTimeListCreateAPIView.as_view()),
 ]

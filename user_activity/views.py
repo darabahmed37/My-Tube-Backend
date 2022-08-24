@@ -1,10 +1,15 @@
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, ListCreateAPIView
 
-from user_activity.models import Timer
-from user_activity.serializer import TimerSerializer
+from user_activity.models import Timer, WatchTiming
+from user_activity.serializer import WatchTimingSerializer
 
 
-class TimerRAUAPIView(RetrieveUpdateAPIView):
-    queryset = Timer.objects.all()
-    serializer_class = TimerSerializer
-    lookup_field = ["user__email", "user__id"]
+class WatchTimeRAUAPIView(RetrieveUpdateDestroyAPIView):
+    queryset = WatchTiming.objects.all()
+    serializer_class = WatchTimingSerializer
+    lookup_field = "user"
+
+
+class WatchTimeListCreateAPIView(ListCreateAPIView):
+    queryset = WatchTiming.objects.all()
+    serializer_class = WatchTimingSerializer

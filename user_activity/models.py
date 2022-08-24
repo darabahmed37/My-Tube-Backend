@@ -2,8 +2,12 @@ from django.db import models
 
 
 class Timer(models.Model):
-    total_time = models.IntegerField(default=5)
-    remaining_time = models.IntegerField(default=0)
-    login_time = models.DateTimeField(auto_now=True)
-    timer = models.ForeignKey("Timer", on_delete=models.CASCADE, related_name="CurrentTimer")
-    old_timers = models.ManyToManyField("Timer", related_name="PreviousTimers")
+    total_time = models.FloatField(default=5)
+    used_time = models.FloatField(default=0)
+    date = models.DateField(auto_now=True)
+
+
+class WatchTiming(models.Model):
+    user = models.OneToOneField('authentication.User', on_delete=models.CASCADE, primary_key=True)
+    current_timer = models.OneToOneField(Timer, on_delete=models.CASCADE, related_name='current_timer')
+    previous_timers = models.ForeignKey(Timer, on_delete=models.CASCADE, related_name="previous_timers", null=True)
