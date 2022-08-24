@@ -4,7 +4,7 @@ from django.db import models
 class Timer(models.Model):
     total_time = models.FloatField(default=5)
     used_time = models.FloatField(default=0)
-    date = models.DateField(auto_now=True)
+    date = models.DateTimeField(auto_now=True)
 
 
 class WatchTiming(models.Model):

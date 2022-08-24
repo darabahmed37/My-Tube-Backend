@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 
 from user_activity.models import Timer, WatchTiming
@@ -7,6 +9,7 @@ class TimerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Timer
         exclude = ("id",)
+        partial = True
 
 
 class WatchTimingSerializer(serializers.ModelSerializer):
@@ -29,9 +32,12 @@ class WatchTimingSerializer(serializers.ModelSerializer):
                                                   previous_timers=None)
         return watch_timing
 
-    def update_current_timer(self, watch_timing, current_timer_data):
-        watch_timing.previous_timers.add(watch_timing.current_timer)
-        watch_timing.current_timer = Timer.objects.create(**current_timer_data)
-        watch_timing.save()
-        return watch_timing
+    def update(self, instance: WatchTiming, validated_data):
+        if instance.current_timer.date.date() < datetime.now().date():
+            instance.previous_timers.add(instance.current_timer)
+            instance.current_timer = Timer.objects.create()
 
+        elif "updated_time" in self.context["request"].data and instance.current_timer.used_time < instance.current_timer.total_time:
+            instance.current_timer.used_time += self.context["request"].data["updated_time"]
+        instance.current_timer.save()
+        return instance
