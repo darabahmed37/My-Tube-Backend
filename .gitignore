@@ -12,5 +12,4 @@ client_secret.json
 /.idea/
 /venv/
 .DS_Store
-*/migrations/*
 */__pycache__/*
