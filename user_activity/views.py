@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
 from user_activity.models import Timer, PreviousTimers
 from user_activity.serializer import TimerSerializer, PreviousTimersSerializer
@@ -10,12 +11,15 @@ class TimerCreate(generics.CreateAPIView):
 
 
 class TimerRUD(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Timer.objects.all()
     serializer_class = TimerSerializer
-    lookup_field = "user"
+
+    def get_object(self):
+        query = Timer.objects.all()
+        return get_object_or_404(query, user=self.request.user)
 
 
 class PreviousTimerRetrieve(generics.ListAPIView):
-    queryset = PreviousTimers.objects.all()
     serializer_class = PreviousTimersSerializer
-    lookup_field = "user"
+
+    def get_queryset(self):
+        return PreviousTimers.objects.filter(user=self.request.user.email)
