@@ -146,3 +146,10 @@ class GetUserInfo(APIView):
     def get(self, request):
         user: User = request.user
         return Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+
+
+class DeleteUser(APIView):
+    def delete(self, request):
+        user: User = request.user
+        user.delete()
+        return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)
