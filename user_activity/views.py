@@ -22,4 +22,4 @@ class PreviousTimerRetrieve(generics.ListAPIView):
     serializer_class = PreviousTimersSerializer
 
     def get_queryset(self):
-        return PreviousTimers.objects.filter(user=self.request.user.email)
+        return PreviousTimers.objects.filter(user=self.request.user.email).order_by("date")
