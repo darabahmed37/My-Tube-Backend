@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from authentication.apps import get_authorization_url, Request
 from authentication.apps import scopes
 from authentication.models import User
+from authentication.serializer import UserSerializer
 from authentication.tokens import send_tokens, get_tokens_for_user
 
 """
@@ -63,13 +64,12 @@ class OAuthCallBack(APIView):
             'oauth2', 'v2', credentials=credentials)  # Get User Details
         user_info = user_info_service.userinfo().get().execute()
         user_info = {key: value for key, value in user_info.items() if
-                     key in ["email", "family_name", "given_name", "refresh", 'id', 'locale', 'picture']}
+                     key in ["email", "family_name", "given_name", 'id', 'locale', 'picture']}
         try:
             user = User.objects.get(email=user_info['email'])
             if credentials.refresh_token is not None:
+                User.objects.filter(email=user_info['email']).update(**user_info, refresh=credentials.refresh_token)
 
-                user.refresh = credentials.refresh_token
-                user.save()
             elif user.refresh == "":
 
                 return Response(
@@ -77,9 +77,16 @@ class OAuthCallBack(APIView):
                      "redirectUrl": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
 
                     status=status.HTTP_307_TEMPORARY_REDIRECT)
+
         except User.DoesNotExist:
-            user = User(**user_info)
+            if credentials.refresh_token is None:
+                return Response(
+                    {"message": "Google Login Required",
+                     "redirectUrl": urljoin(os.getenv("DOMAIN"), "auth/login-with-google/?prompt=consent")},
+                    status=status.HTTP_307_TEMPORARY_REDIRECT)
+            user = User(**user_info, refresh=credentials.refresh_token)
             user.save()
+
         user_logged_in.send(sender=user.__class__,
                             request=request, user=user)
         return send_tokens(get_tokens_for_user(user))
@@ -127,9 +134,22 @@ class SignInWithEmailAndPassword(APIView):
 class UpdatePassword(APIView):
     def post(self, request):
         user: User = request.user
-        update_parm = request.data.dict()
-        if "password" in update_parm.keys():
-            user.set_password(update_parm["password"])
+        if "password" in request.data.keys():
+            user.set_password(request.data["password"])
             user.save()
             return Response({"message": "Password updated successfully"}, status=status.HTTP_202_ACCEPTED)
-        return Response({"message": "Password not updated"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"message": "Please send Password in Request Body"},
+                        status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class GetUserInfo(APIView):
+    def get(self, request):
+        user: User = request.user
+        return Response({"user": UserSerializer(user).data}, status=status.HTTP_200_OK)
+
+
+class DeleteUser(APIView):
+    def delete(self, request):
+        user: User = request.user
+        user.delete()
+        return Response({"message": "User deleted successfully"}, status=status.HTTP_200_OK)

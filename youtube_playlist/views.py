@@ -1,7 +1,8 @@
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from authentication.apps import get_youtube
+from authentication.apps import get_youtube, Request
 
 
 class FetchPlayList(APIView):
@@ -11,8 +12,12 @@ class FetchPlayList(APIView):
                                              maxResults=25,
                                              mine=True,
 
-                                             ).execute()
-        return Response(playlists)
+                                             )
+        try:
+            data = playlists.execute()
+            return Response(data)
+        except Exception as e:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class GetPlayListItems(APIView):
@@ -32,3 +37,12 @@ class GetVideoInfo(APIView):
                                            id=video_id,
                                            ).execute()
         return Response(video_info)
+
+
+class SetUserPlaylist(APIView):
+    def post(self, request: Request):
+        new_playlist = request.data["id"]
+        user = request.user
+        user.playlist = new_playlist
+        user.save()
+        return Response({"status": "ok"}, status=200)

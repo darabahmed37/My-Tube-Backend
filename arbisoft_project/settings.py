@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'authentication',
     "rest_framework_simplejwt",
     "corsheaders",
-    "youtube_playlist"
+    "youtube_playlist",
+    "user_activity",
 
 ]
 
@@ -145,3 +146,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_HEADERS = default_headers + (
     'Access-Control-Allow-Origin',
 )
+#
+# SIMPLE_JWT = {
+#     'ACCESS_TOKEN_LIFETIME': timedelta(seconds=5),
+# }
