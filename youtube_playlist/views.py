@@ -1,10 +1,13 @@
+from django.db.models import QuerySet
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authentication.apps import get_youtube, Request
+from .models import Tags
 from .serializer import TagsSerializer
+from .utils import compare_tags
 
 
 class FetchPlayList(APIView):
@@ -38,16 +41,24 @@ class GetVideoInfo(APIView):
         video_info = youtube.videos().list(part="snippet,contentDetails,player",
                                            id=video_id,
                                            ).execute()
-        tags = video_info['items'][0]['snippet']['tags']
-        user_tags = request.user.tags.all()
-        user_tags = [tag.tag for tag in user_tags]
-        for t in tags:
-            if t not in user_tags:
-                request.user.tags.create(tag=t)
-            else:
-                current_tag = request.user.tags.filter(tag=t)
-                current_tag.update(count=current_tag[0].count + 1)
-                current_tag[0].save()
+
+        try:
+            tags = video_info['items'][0]['snippet']['tags']
+            user_tags = request.user.tags.all()
+            user_tags = [tag.tag for tag in user_tags]
+            for t in tags:
+                tag_out = compare_tags(t, user_tags)
+
+                try:
+                    current_tag: QuerySet[Tags] = request.user.tags.filter(tag=tag_out)
+                    new_count = current_tag[0].count + 1
+                    current_tag.update(count=new_count)
+                    current_tag[0].save()
+                except Exception as e:
+                    request.user.tags.create(tag=t)
+                    user_tags.append(t)
+        except Exception as e:
+            print(e)
         return Response(video_info)
 
 
