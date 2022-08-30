@@ -55,8 +55,9 @@ class GetVideoInfo(APIView):
                     current_tag.update(count=new_count)
                     current_tag[0].save()
                 except Exception as e:
-                    request.user.tags.create(tag=t)
-                    user_tags.append(t)
+                    if len(t) < 10:
+                        request.user.tags.create(tag=t.lower())
+                        user_tags.append(t)
         except Exception as e:
             print(e)
         return Response(video_info)
