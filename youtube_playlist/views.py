@@ -1,8 +1,10 @@
+from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from authentication.apps import get_youtube, Request
+from .serializer import TagsSerializer
 
 
 class FetchPlayList(APIView):
@@ -36,6 +38,16 @@ class GetVideoInfo(APIView):
         video_info = youtube.videos().list(part="snippet,contentDetails,player",
                                            id=video_id,
                                            ).execute()
+        tags = video_info['items'][0]['snippet']['tags']
+        user_tags = request.user.tags.all()
+        user_tags = [tag.tag for tag in user_tags]
+        for t in tags:
+            if t not in user_tags:
+                request.user.tags.create(tag=t)
+            else:
+                current_tag = request.user.tags.filter(tag=t)
+                current_tag.update(count=current_tag[0].count + 1)
+                current_tag[0].save()
         return Response(video_info)
 
 
@@ -46,3 +58,11 @@ class SetUserPlaylist(APIView):
         user.playlist = new_playlist
         user.save()
         return Response({"status": "ok"}, status=200)
+
+
+class GetTags(generics.ListAPIView):
+    serializer_class = TagsSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.tags.all()
