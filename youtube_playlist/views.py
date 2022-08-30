@@ -76,4 +76,7 @@ class GetTags(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return user.tags.all()
+        tags: QuerySet[Tags] = user.tags.all()
+        max_value = tags.order_by("-count")[:5]
+
+        return max_value

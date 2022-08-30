@@ -13,3 +13,4 @@ def compare_tags(tag: str, tags: list[str]):
         if output is not None:
             return output
     return None
+
