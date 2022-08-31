@@ -29,7 +29,8 @@ class TimerSerializer(serializers.ModelSerializer):
                     instance.save()
 
                 return instance
-            instance.total_time = validated_data['total_time']
+            if validated_data.get("total_time"):
+                instance.total_time = validated_data['total_time']
 
             instance.date = datetime.now()
             instance.save()
