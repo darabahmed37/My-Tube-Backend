@@ -14,6 +14,7 @@
 5. DOMAIN
 6. FRONT_END_DOMAIN
 7. OAUTH_CALLBACK
+8. DB_NAME
 
 > All the Domain should end with / forward slash
 
