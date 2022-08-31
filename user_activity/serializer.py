@@ -23,7 +23,7 @@ class TimerSerializer(serializers.ModelSerializer):
             return instance
         else:
             if instance.total_time <= 0:
-                if self.context["request"].data["availed_time"] and not instance.availed_time:
+                if validated_data["availed_time"] and not instance.availed_time:
                     instance.total_time = 2
                     instance.availed_time = True
                     instance.save()
