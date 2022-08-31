@@ -15,7 +15,9 @@ class TimerRUD(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         query = Timer.objects.all()
-        return get_object_or_404(query, user=self.request.user)
+        obj = get_object_or_404(query, user=self.request.user)
+        TimerSerializer().update(obj, self.request.data)
+        return obj
 
 
 class PreviousTimerRetrieve(generics.ListAPIView):
