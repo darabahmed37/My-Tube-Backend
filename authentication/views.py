@@ -49,11 +49,10 @@ class OAuthCallBack(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request: Request):
-        state = request.data.get("state")
         code = request.data.get("code")
         flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file('client_secret.json',
                                                                        scopes=scopes,
-                                                                       state=state)
+                                                                       )
 
         flow.redirect_uri = urljoin(
             os.getenv("FRONT_END_DOMAIN"), os.getenv("OAUTH_CALLBACK"))
