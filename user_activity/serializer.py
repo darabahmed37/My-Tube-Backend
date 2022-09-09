@@ -15,7 +15,8 @@ class TimerSerializer(serializers.ModelSerializer):
     def update(self, instance: Timer, validated_data):
         delta = instance.date.date() - datetime.now().date()
         if delta.days < 0:
-            PreviousTimers.objects.create(total_time=instance.total_time, date=instance.date, user=instance.user, availed_time=instance.availed_time)
+            PreviousTimers.objects.create(total_time=instance.total_time, date=instance.date, user=instance.user,
+                                          availed_time=instance.availed_time)
             instance.total_time = 2
             instance.date = datetime.now()
             instance.availed_time = False
@@ -45,4 +46,4 @@ class PreviousTimersSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PreviousTimers
-        fields = ('total_time', 'date', 'user')
+        fields = ('total_time', 'date', 'user', "availed_time")
