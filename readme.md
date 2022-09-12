@@ -1,16 +1,53 @@
+# My Tube Backend
+
+## Django Setup
+
 ### .ENV
 
-> DJANGO_SECRET_KEY=88888888
+> Create .env file in root directory
+>> Add Following env variables
 
-> DB_USERNAME=88888888
+1. DJANGO_SECRET_KEY
+2. DB_USERNAME
+3. DB_PASSWORD
+4. DB_PORT
+5. DOMAIN
+6. FRONT_END_DOMAIN
+7. OAUTH_CALLBACK
+8. DB_NAME
 
-> DB_PASSWORD=88888888
+> All the Domain should end with / forward slash
 
-> DB_PORT=88888888
+### Database
 
-> DOMAIN=88888888
+You need Postgres installed into your system
 
-> FRONT_END_DOMAIN=88888888
->
+### Virtual Environment
 
-These Variables must be added in .env file
+Create a Virtual environment and install python packages from requirements.txt. use this command to install all packages
+
+> pip install -r requirements.txt
+
+#### Google Credential
+
+Create an account on Google developer console
+> Enable YouTube Data Api
+
+> Enable Oauth2 and YouTube Public API KEYS
+> Add Redirect URI in Oauth2 For Example
+> http://localhost:3000/redirecting/
+
+*Go back to .env file and add OAUTH_CALLBACK=redirecting/*
+
+**Download Oauth2 Credentials and rename it as <client_secret.json>**
+
+Place client_secret.json in root directory
+
+You are good to Go
+
+Run
+> python3 manage.py runserver 8000
+
+
+
+
